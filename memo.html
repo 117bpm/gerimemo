@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<link rel="manifest" href="manifest.json">
+  <meta charset="UTF-8">
+  <title>メモ帳</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      height: 100vh;
+      margin: 0;
+    }
+    #list {
+      width: 220px;
+      border-right: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+    #list button {
+      width: 100%;
+      margin-bottom: 5px;
+    }
+    #editor {
+      flex: 1;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    input {
+      font-size: 16px;
+      padding: 5px;
+    }
+    textarea {
+      flex: 1;
+      font-size: 16px;
+    }
+    #delete {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
+</script>
+
+<body>
+
+  <div id="list">
+    <button id="add">＋ 新しいメモ</button>
+    <div id="memos"></div>
+  </div>
+
+  <div id="editor">
+    <input id="title" placeholder="タイトル">
+    <textarea id="body" placeholder="本文"></textarea>
+    <button id="delete">このメモを削除</button>
+  </div>
+
+  <script>
+    const titleInput = document.getElementById("title");
+    const bodyArea = document.getElementById("body");
+    const memosDiv = document.getElementById("memos");
+    const addButton = document.getElementById("add");
+    const deleteButton = document.getElementById("delete");
+
+    let memos = JSON.parse(localStorage.getItem("memos")) || [];
+    let currentIndex = null;
+
+    function save() {
+      localStorage.setItem("memos", JSON.stringify(memos));
+    }
+
+    function renderList() {
+      memosDiv.innerHTML = "";
+      memos.forEach((memo, index) => {
+        const btn = document.createElement("button");
+        btn.textContent = memo.title || "（無題）";
+        btn.onclick = () => {
+          currentIndex = index;
+          titleInput.value = memo.title;
+          bodyArea.value = memo.body;
+        };
+        memosDiv.appendChild(btn);
+      });
+    }
+
+    // 新しいメモ
+    addButton.onclick = () => {
+      memos.push({ title: "", body: "" });
+      currentIndex = memos.length - 1;
+      titleInput.value = "";
+      bodyArea.value = "";
+      save();
+      renderList();
+    };
+
+    // タイトル保存
+    titleInput.addEventListener("input", () => {
+      if (currentIndex !== null) {
+        memos[currentIndex].title = titleInput.value;
+        save();
+        renderList();
+      }
+    });
+
+    // 本文保存
+    bodyArea.addEventListener("input", () => {
+      if (currentIndex !== null) {
+        memos[currentIndex].body = bodyArea.value;
+        save();
+      }
+    });
+
+    // 削除
+    deleteButton.onclick = () => {
+      if (currentIndex === null) return;
+      if (!confirm("このメモを削除しますか？")) return;
+
+      memos.splice(currentIndex, 1);
+
+      if (memos.length === 0) {
+        currentIndex = null;
+        titleInput.value = "";
+        bodyArea.value = "";
+      } else {
+        currentIndex = 0;
+        titleInput.value = memos[0].title;
+        bodyArea.value = memos[0].body;
+      }
+
+      save();
+      renderList();
+    };
+
+    // 初期表示
+    renderList();
+    if (memos.length > 0) {
+      currentIndex = 0;
+      titleInput.value = memos[0].title;
+      bodyArea.value = memos[0].body;
+    }
+  </script>
+
+</body>
+</html>
