@@ -12,17 +12,21 @@
       height: 100%;
       background: #f2f2f7;
       font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-      overflow: hidden; /* スクロールを抑制 */
+      overflow: hidden;
     }
 
+    /* アプリ全体 */
     .app {
       display: flex;
       flex-direction: column;
-      width: 100%;
-      height: 100%; /* 100%固定 */
+      height: 100%;
       padding: 16px;
       box-sizing: border-box;
       background: white;
+      width: 100%;
+      max-width: 500px; /* PCで中央に固定幅 */
+      margin: 0 auto;   /* PCで中央寄せ */
+      border-radius: 0;
     }
 
     h1 {
@@ -68,8 +72,8 @@
     }
 
     #list {
-      flex: 1;           /* 残りの全スペースをメモ一覧に */
-      overflow-y: auto;  /* メモが増えたらスクロール */
+      flex: 1;
+      overflow-y: auto;
       margin-top: 8px;
     }
 
@@ -92,6 +96,15 @@
       .memo-item { background:#3a3a3c; color:white; }
       .memo-date { color:#aaa; }
     }
+
+    /* スマホでは全画面幅 */
+    @media (max-width: 600px) {
+      .app {
+        max-width: 100%;
+        margin: 0;
+        border-radius: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -106,8 +119,8 @@
   </div>
 
   <script>
-    // タップ前から全画面固定
-    function setAppHeight(){
+    // 高さを画面に合わせて固定
+    function setAppHeight() {
       const app = document.querySelector('.app');
       app.style.height = window.innerHeight + 'px';
     }
