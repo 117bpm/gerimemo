@@ -34,7 +34,8 @@
       box-sizing: border-box;
     }
 
-    button {
+    /* 丸ボタンだけに適用 */
+    #save, .delete {
       border: none;
       border-radius: 50%;
       width: 40px;
@@ -47,6 +48,19 @@
 
     #save { background: #007aff; }
     .delete { background: #ff3b30; }
+
+    /* 並び替えボタンは丸くしない */
+    #sort {
+      border-radius: 8px;
+      width: auto;
+      height: auto;
+      padding: 6px 12px;
+      font-size: 14px;
+      color: white;
+      background: #007aff;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
 
     #list { margin-top: 16px; }
     .memo-item {
@@ -108,7 +122,7 @@
         (m.title + m.content).toLowerCase().includes(filterText)
       );
 
-      filteredMemos.forEach((m, i) => {
+      filteredMemos.forEach((m) => {
         const div = document.createElement('div');
         div.className = 'memo-item';
         div.innerHTML = `
@@ -128,6 +142,7 @@
     }
 
     saveButton.onclick = () => {
+      if (!memoInput.value.trim() && !titleInput.value.trim()) return;
       const now = new Date();
       memos.push({
         title: titleInput.value,
