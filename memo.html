@@ -4,11 +4,170 @@
   <meta charset="UTF-8">
   <title>げりメモ</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <style>
-    /* 全画面対応 */
     html, body {
-      height: 100%;
       margin: 0;
       padding: 0;
-      font-family: system-ui,-apple-system,BlinkMac
+      height: 100%;
+      background: #f2f2f7;
+      font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+      overflow: hidden; /* スクロールを抑制 */
+    }
+
+    .app {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%; /* 100%固定 */
+      padding: 16px;
+      box-sizing: border-box;
+      background: white;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.8em;
+      margin: 8px 0 16px 0;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 20px;
+      color: white;
+      cursor: pointer;
+      margin-right: 8px;
+    }
+
+    #save { background: #007aff; }
+    .delete { background: #ff3b30; }
+
+    #sort {
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 16px;
+      color: white;
+      background: #007aff;
+      cursor: pointer;
+      margin-bottom: 12px;
+      width: auto;
+      height: auto;
+    }
+
+    #list {
+      flex: 1;           /* 残りの全スペースをメモ一覧に */
+      overflow-y: auto;  /* メモが増えたらスクロール */
+      margin-top: 8px;
+    }
+
+    .memo-item {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      background: #f9f9f9;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    .memo-title { font-weight: bold; margin-bottom: 4px; }
+    .memo-date { font-size: 12px; color: #666; margin-bottom: 8px; }
+
+    @media (prefers-color-scheme: dark) {
+      body { background:#1c1c1e; }
+      .app { background:#2c2c2e; color:white; }
+      input,textarea { background:#3a3a3c; color:white; border:none; }
+      .memo-item { background:#3a3a3c; color:white; }
+      .memo-date { color:#aaa; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>メモ帳</h1>
+    <input id="title" placeholder="タイトル">
+    <textarea id="memo" placeholder="メモ内容"></textarea>
+    <input id="search" placeholder="検索...">
+    <button id="sort">新しい順</button>
+    <button id="save">+</button>
+    <div id="list"></div>
+  </div>
+
+  <script>
+    // タップ前から全画面固定
+    function setAppHeight(){
+      const app = document.querySelector('.app');
+      app.style.height = window.innerHeight + 'px';
+    }
+    window.addEventListener('load', setAppHeight);
+    window.addEventListener('resize', setAppHeight);
+
+    const titleInput = document.getElementById('title');
+    const memoInput = document.getElementById('memo');
+    const saveButton = document.getElementById('save');
+    const listDiv = document.getElementById('list');
+    const searchInput = document.getElementById('search');
+    const sortButton = document.getElementById('sort');
+
+    let memos = JSON.parse(localStorage.getItem('memos') || '[]');
+    let sortNewest = true;
+
+    function renderMemos() {
+      listDiv.innerHTML = '';
+      const sorted = [...memos].sort((a,b)=>sortNewest?new Date(b.date)-new Date(a.date):new Date(a.date)-new Date(b.date));
+      const filter = searchInput.value.toLowerCase();
+      const filtered = sorted.filter(m=>(m.title+m.content).toLowerCase().includes(filter));
+      filtered.forEach(m=>{
+        const div = document.createElement('div');
+        div.className = 'memo-item';
+        div.innerHTML = `<div class="memo-title">${m.title||'(無題)'}</div><div class="memo-date">${m.date}</div><div>${m.content}</div><button class="delete">🗑️</button>`;
+        div.querySelector('.delete').onclick = ()=>{
+          const index = memos.findIndex(x=>x.date===m.date&&x.title===m.title);
+          memos.splice(index,1);
+          localStorage.setItem('memos',JSON.stringify(memos));
+          renderMemos();
+        };
+        listDiv.appendChild(div);
+      });
+    }
+
+    saveButton.onclick = ()=>{
+      if(!titleInput.value.trim()&&!memoInput.value.trim()) return;
+      const now = new Date();
+      memos.push({title:titleInput.value, content:memoInput.value, date:now.toLocaleString()});
+      localStorage.setItem('memos',JSON.stringify(memos));
+      titleInput.value=''; memoInput.value='';
+      renderMemos();
+    };
+
+    searchInput.oninput = renderMemos;
+    sortButton.onclick = ()=>{
+      sortNewest=!sortNewest;
+      sortButton.textContent = sortNewest?'新しい順':'古い順';
+      renderMemos();
+    };
+
+    renderMemos();
+  </script>
+
+  <script>
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('sw.js')
+        .then(()=>console.log('Service Worker registered'))
+        .catch(err=>console.log('SW registration failed',err));
+    }
+  </script>
+</body>
+</html>
