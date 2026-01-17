@@ -21,11 +21,7 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    h1 {
-      text-align: center;
-      margin-top: 0;
-      margin-bottom: 16px;
-    }
+    h1 { text-align: center; margin-top: 0; margin-bottom: 16px; }
 
     input, textarea {
       width: 100%;
@@ -38,7 +34,6 @@
       box-sizing: border-box;
     }
 
-    /* アイコンボタン */
     button {
       border: none;
       border-radius: 50%;
@@ -80,15 +75,16 @@
     <h1>メモ帳</h1>
     <input id="title" placeholder="タイトル">
     <textarea id="memo" placeholder="メモ内容"></textarea>
-    
-    <!-- 追加: 検索バーと並び替え -->
+
+    <!-- 検索バーと並び替え -->
     <input id="search" placeholder="検索...">
     <button id="sort">新しい順</button>
-    
+
     <button id="save">+</button>
     <div id="list"></div>
   </div>
 
+  <!-- メモ帳機能のJavaScript -->
   <script>
     const titleInput = document.getElementById('title');
     const memoInput = document.getElementById('memo');
@@ -98,17 +94,15 @@
     const sortButton = document.getElementById('sort');
 
     let memos = JSON.parse(localStorage.getItem('memos') || '[]');
-    let sortNewest = true; // 新しい順
+    let sortNewest = true;
 
     function renderMemos() {
       listDiv.innerHTML = '';
 
-      // 並び替え
-      const sortedMemos = [...memos].sort((a,b) => {
-        return sortNewest ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date);
-      });
+      const sortedMemos = [...memos].sort((a,b) =>
+        sortNewest ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date)
+      );
 
-      // 検索
       const filterText = searchInput.value.toLowerCase();
       const filteredMemos = sortedMemos.filter(m =>
         (m.title + m.content).toLowerCase().includes(filterText)
@@ -133,7 +127,6 @@
       });
     }
 
-    // 保存
     saveButton.onclick = () => {
       const now = new Date();
       memos.push({
@@ -147,10 +140,8 @@
       renderMemos();
     };
 
-    // 検索入力が変わるたびに再描画
     searchInput.oninput = renderMemos;
 
-    // 並び替えボタン
     sortButton.onclick = () => {
       sortNewest = !sortNewest;
       sortButton.textContent = sortNewest ? '新しい順' : '古い順';
@@ -158,6 +149,15 @@
     };
 
     renderMemos();
+  </script>
+
+  <!-- Service Worker登録 -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed', err));
+    }
   </script>
 </body>
 </html>
