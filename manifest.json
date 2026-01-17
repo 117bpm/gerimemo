@@ -1,6 +1,6 @@
 {
   "name": "メモ帳",
-  "short_name": "メモ帳",
+  "short_name": "げりメモ",
   "start_url": "memo.html",
   "display": "standalone",
   "background_color": "#f2f2f7",
