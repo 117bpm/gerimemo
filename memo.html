@@ -4,87 +4,11 @@
   <meta charset="UTF-8">
   <title>げりメモ</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif; background:#f2f2f7; margin:0; padding:20px; }
-    .app { max-width:500px; margin:0 auto; background:white; border-radius:16px; padding:16px; box-shadow:0 10px 30px rgba(0,0,0,0.1); }
-    h1 { text-align:center; margin-top:0; margin-bottom:16px; }
-    input,textarea { width:100%; padding:8px; margin-bottom:12px; border:1px solid #ccc; border-radius:8px; font-size:14px; box-sizing:border-box; }
-    #save,.delete { border:none; border-radius:50%; width:40px; height:40px; font-size:18px; color:white; cursor:pointer; margin-right:8px; }
-    #save { background:#007aff; }
-    .delete { background:#ff3b30; }
-    #sort { border-radius:8px; width:auto; height:auto; padding:6px 12px; font-size:14px; color:white; background:#007aff; cursor:pointer; margin-bottom:12px; }
-    #list { margin-top:16px; }
-    .memo-item { padding:12px; margin-bottom:12px; border-radius:12px; background:#f9f9f9; box-shadow:0 4px 10px rgba(0,0,0,0.05); position:relative; }
-    .memo-title { font-weight:bold; margin-bottom:4px; }
-    .memo-date { font-size:12px; color:#666; margin-bottom:8px; }
-    @media (prefers-color-scheme: dark) {
-      body { background:#1c1c1e; }
-      .app { background:#2c2c2e; color:white; }
-      input,textarea { background:#3a3a3c; color:white; border:none; }
-      .memo-item { background:#3a3a3c; color:white; }
-      .memo-date { color:#aaa; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app">
-    <h1>メモ帳</h1>
-    <input id="title" placeholder="タイトル">
-    <textarea id="memo" placeholder="メモ内容"></textarea>
-    <input id="search" placeholder="検索...">
-    <button id="sort">新しい順</button>
-    <button id="save">+</button>
-    <div id="list"></div>
-  </div>
-
-  <script>
-    const titleInput=document.getElementById('title');
-    const memoInput=document.getElementById('memo');
-    const saveButton=document.getElementById('save');
-    const listDiv=document.getElementById('list');
-    const searchInput=document.getElementById('search');
-    const sortButton=document.getElementById('sort');
-
-    let memos=JSON.parse(localStorage.getItem('memos')||'[]');
-    let sortNewest=true;
-
-    function renderMemos(){
-      listDiv.innerHTML='';
-      const sorted=[...memos].sort((a,b)=>sortNewest?new Date(b.date)-new Date(a.date):new Date(a.date)-new Date(b.date));
-      const filter=searchInput.value.toLowerCase();
-      const filtered=sorted.filter(m=>(m.title+m.content).toLowerCase().includes(filter));
-      filtered.forEach(m=>{
-        const div=document.createElement('div');
-        div.className='memo-item';
-        div.innerHTML=`<div class="memo-title">${m.title||'(無題)'}</div><div class="memo-date">${m.date}</div><div>${m.content}</div><button class="delete">🗑️</button>`;
-        div.querySelector('.delete').onclick=()=>{
-          const index=memos.findIndex(x=>x.date===m.date&&x.title===m.title);
-          memos.splice(index,1);
-          localStorage.setItem('memos',JSON.stringify(memos));
-          renderMemos();
-        };
-        listDiv.appendChild(div);
-      });
-    }
-
-    saveButton.onclick=()=>{
-      if(!titleInput.value.trim()&&!memoInput.value.trim()) return;
-      const now=new Date();
-      memos.push({title:titleInput.value, content:memoInput.value, date:now.toLocaleString()});
-      localStorage.setItem('memos',JSON.stringify(memos));
-      titleInput.value=''; memoInput.value='';
-      renderMemos();
-    };
-
-    searchInput.oninput=renderMemos;
-    sortButton.onclick=()=>{sortNewest=!sortNewest; sortButton.textContent=sortNewest?'新しい順':'古い順'; renderMemos();};
-    renderMemos();
-  </script>
-
-  <script>
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('sw.js').then(()=>console.log('Service Worker registered')).catch(err=>console.log('SW registration failed',err));
-    }
-  </script>
-</body>
-</html>
+    /* 全画面対応 */
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui,-apple-system,BlinkMac
