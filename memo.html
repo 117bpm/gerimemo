@@ -4,10 +4,7 @@
   <meta charset="UTF-8">
   <title>げりメモ</title>
   <link rel="manifest" href="manifest.json">
-
-  <!-- CSS ここから -->
   <style>
-    /* 全体の背景と文字 */
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background: #f2f2f7;
@@ -15,7 +12,6 @@
       padding: 20px;
     }
 
-    /* 中央カード */
     .app {
       max-width: 500px;
       margin: 0 auto;
@@ -25,115 +21,111 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
 
-    /* タイトル */
     h1 {
       text-align: center;
       margin-top: 0;
       margin-bottom: 16px;
     }
 
-    /* 入力欄 */
     input, textarea {
       width: 100%;
       padding: 8px;
       margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
-      box-sizing: border-box;
       font-size: 14px;
       font-family: inherit;
+      box-sizing: border-box;
     }
 
-    /* ボタン */
+    /* アイコンボタン */
     button {
-      background: #007aff;
-      color: white;
       border: none;
-      border-radius: 10px;
-      padding: 8px 12px;
-      font-size: 14px;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      color: white;
       cursor: pointer;
       margin-right: 8px;
     }
 
-    /* 削除ボタン */
-    button.delete {
-      background: #ff3b30;
-    }
+    #save { background: #007aff; }
+    .delete { background: #ff3b30; }
 
-    /* メモリスト */
-    #list {
-      margin-top: 16px;
-    }
-
+    #list { margin-top: 16px; }
     .memo-item {
       padding: 12px;
       margin-bottom: 12px;
       border-radius: 12px;
       background: #f9f9f9;
       box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      position: relative;
     }
 
-    .memo-title {
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
+    .memo-title { font-weight: bold; margin-bottom: 4px; }
+    .memo-date { font-size: 12px; color: #666; margin-bottom: 8px; }
 
-    /* ダークモード対応 */
     @media (prefers-color-scheme: dark) {
-      body {
-        background: #1c1c1e;
-      }
-
-      .app {
-        background: #2c2c2e;
-        color: white;
-      }
-
-      input, textarea {
-        background: #3a3a3c;
-        color: white;
-        border: none;
-      }
-
-      .memo-item {
-        background: #3a3a3c;
-      }
+      body { background: #1c1c1e; }
+      .app { background: #2c2c2e; color: white; }
+      input, textarea { background: #3a3a3c; color: white; border: none; }
+      .memo-item { background: #3a3a3c; color: white; }
+      .memo-date { color: #aaa; }
     }
   </style>
-  <!-- CSS ここまで -->
 </head>
 <body>
   <div class="app">
     <h1>メモ帳</h1>
     <input id="title" placeholder="タイトル">
     <textarea id="memo" placeholder="メモ内容"></textarea>
-    <button id="save">保存</button>
-
+    
+    <!-- 追加: 検索バーと並び替え -->
+    <input id="search" placeholder="検索...">
+    <button id="sort">新しい順</button>
+    
+    <button id="save">+</button>
     <div id="list"></div>
   </div>
 
-  <!-- JavaScript -->
   <script>
     const titleInput = document.getElementById('title');
     const memoInput = document.getElementById('memo');
     const saveButton = document.getElementById('save');
     const listDiv = document.getElementById('list');
+    const searchInput = document.getElementById('search');
+    const sortButton = document.getElementById('sort');
 
     let memos = JSON.parse(localStorage.getItem('memos') || '[]');
+    let sortNewest = true; // 新しい順
 
     function renderMemos() {
       listDiv.innerHTML = '';
-      memos.forEach((m, i) => {
+
+      // 並び替え
+      const sortedMemos = [...memos].sort((a,b) => {
+        return sortNewest ? new Date(b.date) - new Date(a.date) : new Date(a.date) - new Date(b.date);
+      });
+
+      // 検索
+      const filterText = searchInput.value.toLowerCase();
+      const filteredMemos = sortedMemos.filter(m =>
+        (m.title + m.content).toLowerCase().includes(filterText)
+      );
+
+      filteredMemos.forEach((m, i) => {
         const div = document.createElement('div');
         div.className = 'memo-item';
         div.innerHTML = `
           <div class="memo-title">${m.title || '(無題)'}</div>
+          <div class="memo-date">${m.date}</div>
           <div>${m.content}</div>
-          <button class="delete">削除</button>
+          <button class="delete">🗑️</button>
         `;
         div.querySelector('button.delete').onclick = () => {
-          memos.splice(i, 1);
+          const index = memos.findIndex(x => x.date === m.date && x.title === m.title);
+          memos.splice(index, 1);
           localStorage.setItem('memos', JSON.stringify(memos));
           renderMemos();
         };
@@ -141,14 +133,27 @@
       });
     }
 
+    // 保存
     saveButton.onclick = () => {
+      const now = new Date();
       memos.push({
         title: titleInput.value,
-        content: memoInput.value
+        content: memoInput.value,
+        date: now.toLocaleString()
       });
       localStorage.setItem('memos', JSON.stringify(memos));
       titleInput.value = '';
       memoInput.value = '';
+      renderMemos();
+    };
+
+    // 検索入力が変わるたびに再描画
+    searchInput.oninput = renderMemos;
+
+    // 並び替えボタン
+    sortButton.onclick = () => {
+      sortNewest = !sortNewest;
+      sortButton.textContent = sortNewest ? '新しい順' : '古い順';
       renderMemos();
     };
 
