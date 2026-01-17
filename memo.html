@@ -1,155 +1,158 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<link rel="manifest" href="manifest.json">
   <meta charset="UTF-8">
   <title>メモ帳</title>
+  <link rel="manifest" href="manifest.json">
+
+  <!-- CSS ここから -->
   <style>
+    /* 全体の背景と文字 */
     body {
-      font-family: sans-serif;
-      display: flex;
-      height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f2f2f7;
       margin: 0;
+      padding: 20px;
     }
-    #list {
-      width: 220px;
-      border-right: 1px solid #ccc;
-      padding: 10px;
-      box-sizing: border-box;
+
+    /* 中央カード */
+    .app {
+      max-width: 500px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-    #list button {
+
+    /* タイトル */
+    h1 {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 16px;
+    }
+
+    /* 入力欄 */
+    input, textarea {
       width: 100%;
-      margin-bottom: 5px;
-    }
-    #editor {
-      flex: 1;
-      padding: 10px;
+      padding: 8px;
+      margin-bottom: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      font-size: 14px;
+      font-family: inherit;
     }
-    input {
-      font-size: 16px;
-      padding: 5px;
-    }
-    textarea {
-      flex: 1;
-      font-size: 16px;
-    }
-    #delete {
-      background: #f44336;
+
+    /* ボタン */
+    button {
+      background: #007aff;
       color: white;
       border: none;
-      padding: 8px;
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
       cursor: pointer;
+      margin-right: 8px;
+    }
+
+    /* 削除ボタン */
+    button.delete {
+      background: #ff3b30;
+    }
+
+    /* メモリスト */
+    #list {
+      margin-top: 16px;
+    }
+
+    .memo-item {
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      background: #f9f9f9;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .memo-title {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    /* ダークモード対応 */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1c1c1e;
+      }
+
+      .app {
+        background: #2c2c2e;
+        color: white;
+      }
+
+      input, textarea {
+        background: #3a3a3c;
+        color: white;
+        border: none;
+      }
+
+      .memo-item {
+        background: #3a3a3c;
+      }
     }
   </style>
+  <!-- CSS ここまで -->
 </head>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("sw.js");
-  }
-</script>
-
 <body>
-
-  <div id="list">
-    <button id="add">＋ 新しいメモ</button>
-    <div id="memos"></div>
-  </div>
-
-  <div id="editor">
+  <div class="app">
+    <h1>メモ帳</h1>
     <input id="title" placeholder="タイトル">
-    <textarea id="body" placeholder="本文"></textarea>
-    <button id="delete">このメモを削除</button>
+    <textarea id="memo" placeholder="メモ内容"></textarea>
+    <button id="save">保存</button>
+
+    <div id="list"></div>
   </div>
 
+  <!-- JavaScript -->
   <script>
-    const titleInput = document.getElementById("title");
-    const bodyArea = document.getElementById("body");
-    const memosDiv = document.getElementById("memos");
-    const addButton = document.getElementById("add");
-    const deleteButton = document.getElementById("delete");
+    const titleInput = document.getElementById('title');
+    const memoInput = document.getElementById('memo');
+    const saveButton = document.getElementById('save');
+    const listDiv = document.getElementById('list');
 
-    let memos = JSON.parse(localStorage.getItem("memos")) || [];
-    let currentIndex = null;
+    let memos = JSON.parse(localStorage.getItem('memos') || '[]');
 
-    function save() {
-      localStorage.setItem("memos", JSON.stringify(memos));
-    }
-
-    function renderList() {
-      memosDiv.innerHTML = "";
-      memos.forEach((memo, index) => {
-        const btn = document.createElement("button");
-        btn.textContent = memo.title || "（無題）";
-        btn.onclick = () => {
-          currentIndex = index;
-          titleInput.value = memo.title;
-          bodyArea.value = memo.body;
+    function renderMemos() {
+      listDiv.innerHTML = '';
+      memos.forEach((m, i) => {
+        const div = document.createElement('div');
+        div.className = 'memo-item';
+        div.innerHTML = `
+          <div class="memo-title">${m.title || '(無題)'}</div>
+          <div>${m.content}</div>
+          <button class="delete">削除</button>
+        `;
+        div.querySelector('button.delete').onclick = () => {
+          memos.splice(i, 1);
+          localStorage.setItem('memos', JSON.stringify(memos));
+          renderMemos();
         };
-        memosDiv.appendChild(btn);
+        listDiv.appendChild(div);
       });
     }
 
-    // 新しいメモ
-    addButton.onclick = () => {
-      memos.push({ title: "", body: "" });
-      currentIndex = memos.length - 1;
-      titleInput.value = "";
-      bodyArea.value = "";
-      save();
-      renderList();
+    saveButton.onclick = () => {
+      memos.push({
+        title: titleInput.value,
+        content: memoInput.value
+      });
+      localStorage.setItem('memos', JSON.stringify(memos));
+      titleInput.value = '';
+      memoInput.value = '';
+      renderMemos();
     };
 
-    // タイトル保存
-    titleInput.addEventListener("input", () => {
-      if (currentIndex !== null) {
-        memos[currentIndex].title = titleInput.value;
-        save();
-        renderList();
-      }
-    });
-
-    // 本文保存
-    bodyArea.addEventListener("input", () => {
-      if (currentIndex !== null) {
-        memos[currentIndex].body = bodyArea.value;
-        save();
-      }
-    });
-
-    // 削除
-    deleteButton.onclick = () => {
-      if (currentIndex === null) return;
-      if (!confirm("このメモを削除しますか？")) return;
-
-      memos.splice(currentIndex, 1);
-
-      if (memos.length === 0) {
-        currentIndex = null;
-        titleInput.value = "";
-        bodyArea.value = "";
-      } else {
-        currentIndex = 0;
-        titleInput.value = memos[0].title;
-        bodyArea.value = memos[0].body;
-      }
-
-      save();
-      renderList();
-    };
-
-    // 初期表示
-    renderList();
-    if (memos.length > 0) {
-      currentIndex = 0;
-      titleInput.value = memos[0].title;
-      bodyArea.value = memos[0].body;
-    }
+    renderMemos();
   </script>
-
 </body>
 </html>
