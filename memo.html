@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=9">
+<link rel="manifest" href="manifest.json?v=10">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {margin:0; padding:0; height:100%; font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif; background:#f2f2f7;}
@@ -18,11 +18,11 @@ textarea {
   border-radius:8px;
   font-size:16px;
   box-sizing:border-box;
-  height:4.5em;      /* 3行分 */
-  min-height:4.5em;
-  max-height:4.5em;
-  overflow-y:auto;   /* スクロール可能 */
-  resize:none;       /* スマホはハンドル非表示 */
+  height:5em;      /* 3行分＋5px追加 */
+  min-height:5em;
+  max-height:5em;
+  overflow-y:auto;
+  resize:none;     /* スマホはハンドル非表示 */
 }
 @media (min-width:601px) {
   textarea { resize: vertical; } /* PCのみハンドル表示 */
@@ -37,7 +37,7 @@ button {border:none; border-radius:50%; width:48px; height:48px; font-size:20px;
 .memo-date {font-size:12px; color:#666; margin-bottom:8px;}
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
 #canvasContainer {margin-bottom:12px; width:100%;}
-#canvasContainer canvas {width:100%; height:385px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;} /* PC高さ5px減、幅は100% */
+#canvasContainer canvas {width:100%; height:380px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;} /* PC高ささらに5px減・幅は100% */
 #clearCanvas {width:auto; height:auto; border-radius:8px; margin-top:4px; display:block;}
 </style>
 </head>
@@ -50,7 +50,7 @@ button {border:none; border-radius:50%; width:48px; height:48px; font-size:20px;
 
 <!-- 手書きキャンバス -->
 <div id="canvasContainer">
-  <canvas id="drawCanvas" width="400" height="385"></canvas>
+  <canvas id="drawCanvas" width="400" height="380"></canvas>
   <button id="clearCanvas">クリア</button>
 </div>
 
