@@ -1,4 +1,4 @@
-const CACHE_NAME = 'memo-app-cache-v3';
+const CACHE_NAME = 'memo-app-cache-v5';
 const urlsToCache = [
   '/gerimemo/memo.html',
   '/gerimemo/icon.png',

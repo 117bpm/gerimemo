@@ -3,14 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=3">
+<link rel="manifest" href="manifest.json?v=6">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {margin:0; padding:0; height:100%; font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif; background:#f2f2f7;}
 .app {display:flex; flex-direction:column; padding:16px; box-sizing:border-box; background:white; width:100%; max-width:500px; margin:0 auto;}
 h1 {text-align:center; font-size:1.8em; margin:8px 0 16px 0;}
 input, textarea {width:100%; padding:12px; margin-bottom:12px; border:1px solid #ccc; border-radius:8px; font-size:16px; box-sizing:border-box;}
-textarea {min-height:100px; resize:vertical;}
+textarea {
+  min-height:120px;
+  overflow-y:auto;
+  resize: vertical; /* 縦方向にリサイズ可能 */
+}
+@media (max-width:600px) {
+  textarea {
+    min-height:150px; /* スマホで少し高め */
+    resize: vertical; /* ハンドル表示 */
+  }
+}
 button {border:none; border-radius:50%; width:48px; height:48px; font-size:20px; color:white; cursor:pointer; margin-right:8px;}
 #save {background:#007aff;}
 .delete {background:#ff3b30;}
@@ -22,11 +32,10 @@ button {border:none; border-radius:50%; width:48px; height:48px; font-size:20px;
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
 #canvasContainer {margin-bottom:12px; width:100%;}
 #canvasContainer canvas {width:100%; max-width:100%; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
-#clearCanvas {width:auto; height:auto; border-radius:8px; margin-top:4px; display:block;}
-@media (max-width:600px) { 
-  .app {padding:12px;} 
-  textarea {min-height:120px; resize:both;} /* スマホでもリサイズ可能に修正 */
+@media (min-width:601px) {
+  #canvasContainer canvas { max-width: calc(100% - 5px); } /* PC版を5px狭く */
 }
+#clearCanvas {width:auto; height:auto; border-radius:8px; margin-top:4px; display:block;}
 </style>
 </head>
 <body>
@@ -106,7 +115,7 @@ saveButton.onclick = ()=>{
   if(editingIndex!==null){
     memos[editingIndex].title = titleInput.value;
     memos[editingIndex].content = memoInput.value;
-    memos[editingIndex].image = imageData || memos[editingIndex].image; // イラスト残す
+    memos[editingIndex].image = imageData || memos[editingIndex].image;
     memos[editingIndex].date = now.toLocaleString();
     editingIndex = null;
   } else {
