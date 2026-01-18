@@ -6,10 +6,11 @@
   <link rel="manifest" href="manifest.json">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <style>
-    html, body { margin:0; padding:0; height:100%; font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif; background:#f2f2f7; overflow:hidden; }
-    .app { display:flex; flex-direction:column; height:100%; padding:16px; box-sizing:border-box; background:white; width:100%; max-width:500px; margin:0 auto; }
+    html, body { margin:0; padding:0; height:100%; font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif; background:#f2f2f7; }
+    .app { display:flex; flex-direction:column; padding:16px; box-sizing:border-box; background:white; width:100%; max-width:500px; margin:0 auto; }
     h1 { text-align:center; font-size:1.8em; margin:8px 0 16px 0; }
     input, textarea { width:100%; padding:12px; margin-bottom:12px; border:1px solid #ccc; border-radius:8px; font-size:16px; box-sizing:border-box; }
+    textarea { min-height:100px; }
     button { border:none; border-radius:50%; width:48px; height:48px; font-size:20px; color:white; cursor:pointer; margin-right:8px; }
     #save { background:#007aff; }
     .delete { background:#ff3b30; }
@@ -19,8 +20,12 @@
     .memo-title { font-weight:bold; margin-bottom:4px; }
     .memo-date { font-size:12px; color:#666; margin-bottom:8px; }
     #updateNotice { position: fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none; }
-    #canvasContainer canvas { width:100%; height:auto; border:1px solid #ccc; touch-action:none; }
-    #clearCanvas { width:auto; height:auto; border-radius:8px; position:static; margin-top:4px; }
+    #canvasContainer canvas { width:100%; height:auto; max-width:400px; border:1px solid #ccc; touch-action:none; }
+    #clearCanvas { width:auto; height:auto; border-radius:8px; margin-top:4px; }
+
+    @media (max-width:600px) {
+      .app { padding:12px; }
+    }
   </style>
 </head>
 <body>
@@ -42,44 +47,42 @@
   </div>
 
   <script>
-    // --- memos 配列初期化 ---
+    // --- memos 配列 ---
     let memos = JSON.parse(localStorage.getItem('memos') || '[]');
     let sortNewest = true;
     let editingIndex = null;
 
-    // --- renderMemos 関数 ---
+    // --- renderMemos ---
     function renderMemos() {
       const listDiv = document.getElementById('list');
       listDiv.innerHTML = '';
 
-      const sorted = [...memos].sort((a,b) => sortNewest ? new Date(b.date)-new Date(a.date) : new Date(a.date)-new Date(b.date));
+      const sorted = [...memos].sort((a,b)=> sortNewest? new Date(b.date)-new Date(a.date) : new Date(a.date)-new Date(b.date));
 
       sorted.forEach(m => {
         const index = memos.findIndex(x => x.date===m.date && x.title===m.title);
         const div = document.createElement('div');
-        div.className = 'memo-item';
-        div.innerHTML = `
-          <div class="memo-title">${m.title || '(無題)'}</div>
+        div.className='memo-item';
+        div.innerHTML=`
+          <div class="memo-title">${m.title||'(無題)'}</div>
           <div class="memo-date">${m.date}</div>
           <div>${m.content}</div>
-          ${m.image ? `<img src="${m.image}" style="max-width:100%; border-radius:12px; margin-top:8px;">` : ''}
+          ${m.image? `<img src="${m.image}" style="max-width:100%; border-radius:12px; margin-top:8px;">` : ''}
           <button class="edit">✏️</button>
           <button class="delete">🗑️</button>
         `;
 
-        // 削除
-        div.querySelector('.delete').onclick = () => {
+        div.querySelector('.delete').onclick=()=>{
           memos.splice(index,1);
           localStorage.setItem('memos',JSON.stringify(memos));
           renderMemos();
         };
 
-        // 編集
-        div.querySelector('.edit').onclick = () => {
-          document.getElementById('title').value = m.title;
-          document.getElementById('memo').value = m.content;
-          editingIndex = index;
-          window.scrollTo({ top:0, behavior:'smooth'});
+        div.querySelector('.edit').onclick=()=>{
+          document.getElementById('title').value=m.title;
+          document.getElementById('memo').value=m.content;
+          editingIndex=index;
+          window.scrollTo({top:0,behavior:'smooth'});
         };
 
         listDiv.appendChild(div);
@@ -89,71 +92,69 @@
     // --- 初期表示 ---
     renderMemos();
 
-    // --- ボタンイベント ---
-    const titleInput = document.getElementById('title');
-    const memoInput = document.getElementById('memo');
-    const saveButton = document.getElementById('save');
-    const sortButton = document.getElementById('sort');
+    // --- ボタン操作 ---
+    const titleInput=document.getElementById('title');
+    const memoInput=document.getElementById('memo');
+    const saveButton=document.getElementById('save');
+    const sortButton=document.getElementById('sort');
+    const canvas=document.getElementById('drawCanvas');
+    const ctx=canvas.getContext('2d');
 
-    saveButton.onclick = () => {
+    saveButton.onclick=()=>{
       const textEmpty = !titleInput.value.trim() && !memoInput.value.trim();
-      const canvas = document.getElementById('drawCanvas');
-      const ctx = canvas.getContext('2d');
-      const canvasEmpty = ctx.getImageData(0,0,canvas.width,canvas.height).data.every(v => v === 0);
-
+      const canvasEmpty = ctx.getImageData(0,0,canvas.width,canvas.height).data.every(v=>v===0);
       if(textEmpty && canvasEmpty) return;
 
       const now = new Date();
       const imageData = canvasEmpty ? null : canvas.toDataURL();
 
       if(editingIndex!==null){
-        memos[editingIndex].title = titleInput.value;
-        memos[editingIndex].content = memoInput.value;
-        memos[editingIndex].image = imageData;
-        memos[editingIndex].date = now.toLocaleString();
-        editingIndex = null;
+        memos[editingIndex].title=titleInput.value;
+        memos[editingIndex].content=memoInput.value;
+        memos[editingIndex].image=imageData;
+        memos[editingIndex].date=now.toLocaleString();
+        editingIndex=null;
       } else {
-        memos.push({
-          title: titleInput.value,
-          content: memoInput.value,
-          image: imageData,
-          date: now.toLocaleString()
-        });
+        memos.push({title:titleInput.value, content:memoInput.value, image:imageData, date:now.toLocaleString()});
       }
 
       localStorage.setItem('memos',JSON.stringify(memos));
-      titleInput.value=''; memoInput.value='';
-      ctx.clearRect(0,0,canvas.width,canvas.height);
+      titleInput.value=''; memoInput.value=''; ctx.clearRect(0,0,canvas.width,canvas.height);
       renderMemos();
     };
 
-    sortButton.onclick = () => {
+    sortButton.onclick=()=>{
       sortNewest = !sortNewest;
-      sortButton.textContent = sortNewest?'新しい順':'古い順';
+      sortButton.textContent=sortNewest?'新しい順':'古い順';
       renderMemos();
     };
 
-    // --- 手書きキャンバス描画 ---
-    const canvas = document.getElementById('drawCanvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-    let lastX=0, lastY=0;
+    // --- 手書き描画 ---
+    let drawing=false,lastX=0,lastY=0;
+
+    function getPointerPos(e){
+      const rect=canvas.getBoundingClientRect();
+      const scaleX = canvas.width/rect.width;
+      const scaleY = canvas.height/rect.height;
+      const clientX = e.touches? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches? e.touches[0].clientY : e.clientY;
+      return {x:(clientX - rect.left)*scaleX, y:(clientY - rect.top)*scaleY};
+    }
 
     function startDraw(e){
       drawing=true;
-      const rect=canvas.getBoundingClientRect();
-      lastX=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
-      lastY=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+      const pos=getPointerPos(e);
+      lastX=pos.x; lastY=pos.y;
     }
+
     function draw(e){
       if(!drawing) return;
       e.preventDefault();
-      const rect=canvas.getBoundingClientRect();
-      const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
-      const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
-      ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(x,y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
-      lastX=x; lastY=y;
+      const pos=getPointerPos(e);
+      ctx.beginPath(); ctx.moveTo(lastX,lastY); ctx.lineTo(pos.x,pos.y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke();
+      lastX=pos.x; lastY=pos.y;
     }
+
     function stopDraw(){ drawing=false; }
 
     canvas.addEventListener('mousedown',startDraw);
