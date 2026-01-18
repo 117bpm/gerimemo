@@ -119,6 +119,7 @@
   </div>
 
   <script>
+    let editingIndex = null; // ← 追加（今編集中のメモ）
     // 高さを画面に合わせて固定
     function setAppHeight() {
       const app = document.querySelector('.app');
@@ -138,32 +139,80 @@
     let sortNewest = true;
 
     function renderMemos() {
-      listDiv.innerHTML = '';
-      const sorted = [...memos].sort((a,b)=>sortNewest?new Date(b.date)-new Date(a.date):new Date(a.date)-new Date(b.date));
-      const filter = searchInput.value.toLowerCase();
-      const filtered = sorted.filter(m=>(m.title+m.content).toLowerCase().includes(filter));
-      filtered.forEach(m=>{
-        const div = document.createElement('div');
-        div.className = 'memo-item';
-        div.innerHTML = `<div class="memo-title">${m.title||'(無題)'}</div><div class="memo-date">${m.date}</div><div>${m.content}</div><button class="delete">🗑️</button>`;
-        div.querySelector('.delete').onclick = ()=>{
-          const index = memos.findIndex(x=>x.date===m.date&&x.title===m.title);
-          memos.splice(index,1);
-          localStorage.setItem('memos',JSON.stringify(memos));
-          renderMemos();
-        };
-        listDiv.appendChild(div);
-      });
-    }
+  listDiv.innerHTML = '';
 
-    saveButton.onclick = ()=>{
-      if(!titleInput.value.trim()&&!memoInput.value.trim()) return;
-      const now = new Date();
-      memos.push({title:titleInput.value, content:memoInput.value, date:now.toLocaleString()});
-      localStorage.setItem('memos',JSON.stringify(memos));
-      titleInput.value=''; memoInput.value='';
+  const sorted = [...memos].sort((a, b) =>
+    sortNewest
+      ? new Date(b.date) - new Date(a.date)
+      : new Date(a.date) - new Date(b.date)
+  );
+
+  const filter = searchInput.value.toLowerCase();
+  const filtered = sorted.filter(m =>
+    (m.title + m.content).toLowerCase().includes(filter)
+  );
+
+  filtered.forEach(m => {
+    const index = memos.findIndex(x =>
+      x.date === m.date && x.title === m.title
+    );
+
+    const div = document.createElement('div');
+    div.className = 'memo-item';
+    div.innerHTML = `
+      <div class="memo-title">${m.title || '(無題)'}</div>
+      <div class="memo-date">${m.date}</div>
+      <div>${m.content}</div>
+      <button class="edit">✏️</button>
+      <button class="delete">🗑️</button>
+    `;
+
+    // 削除
+    div.querySelector('.delete').onclick = () => {
+      memos.splice(index, 1);
+      localStorage.setItem('memos', JSON.stringify(memos));
       renderMemos();
     };
+
+    // ★ 編集モードに入る
+    div.querySelector('.edit').onclick = () => {
+      titleInput.value = m.title;
+      memoInput.value = m.content;
+      editingIndex = index;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    listDiv.appendChild(div);
+  });
+}
+
+
+saveButton.onclick = () => {
+  if (!titleInput.value.trim() && !memoInput.value.trim()) return;
+
+  const now = new Date();
+
+  if (editingIndex !== null) {
+    // 編集モード：上書き保存
+    memos[editingIndex].title = titleInput.value;
+    memos[editingIndex].content = memoInput.value;
+    memos[editingIndex].date = now.toLocaleString();
+    editingIndex = null;
+  } else {
+    // 新規作成
+    memos.push({
+      title: titleInput.value,
+      content: memoInput.value,
+      date: now.toLocaleString()
+    });
+  }
+
+  localStorage.setItem('memos', JSON.stringify(memos));
+  titleInput.value = '';
+  memoInput.value = '';
+  renderMemos();
+};
+
 
     searchInput.oninput = renderMemos;
     sortButton.onclick = ()=>{
