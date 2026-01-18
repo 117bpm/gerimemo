@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=14">
+<link rel="manifest" href="manifest.json?v=15">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {
@@ -41,9 +41,11 @@ textarea {
 .memo-title {font-weight:bold; margin-bottom:4px;}
 .memo-date {font-size:12px; color:#666; margin-bottom:8px;}
 .memo-buttons {display:flex; gap:8px; margin-top:8px;}
-.memo-buttons button {flex:1; border-radius:8px; padding:8px; font-size:16px; cursor:pointer; color:white;}
-.memo-buttons .edit {background:#007aff;}
-.memo-buttons .delete {background:#ff3b30;}
+.memo-buttons button {
+  flex:1; border-radius:6px; padding:6px; font-size:14px; cursor:pointer; color:white;
+}
+.memo-buttons .edit {background:#66b0ff;}   /* 控えめ青 */
+.memo-buttons .delete {background:#ff7f7f;} /* 控えめ赤 */
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
 </style>
 </head>
