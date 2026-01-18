@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+このアプリは通信を行いません。
+メモは localStorage にのみ保存されます。
+外部スクリプト・広告・トラッキングはありません。
+-->
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -224,12 +229,25 @@ saveButton.onclick = () => {
     renderMemos();
   </script>
 
-  <script>
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('sw.js')
-        .then(()=>console.log('Service Worker registered'))
-        .catch(err=>console.log('SW registration failed',err));
-    }
-  </script>
+ <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+
+      // Service Worker からのメッセージを受信
+      navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data === 'UPDATED') {
+          alert('アプリが更新されました');
+        }
+      });
+
+      // 更新チェックを要求
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage('CHECK_UPDATE');
+      }
+
+    });
+  }
+</script>
+
 </body>
 </html>
