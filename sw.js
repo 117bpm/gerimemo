@@ -22,9 +22,3 @@ self.addEventListener('activate', event => {
   );
 });
 
-// ★ 更新検知テスト用
-self.addEventListener('message', event => {
-  if (event.data === 'CHECK_UPDATE') {
-    event.source.postMessage('UPDATED');
-  }
-});

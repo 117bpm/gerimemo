@@ -110,9 +110,25 @@
         border-radius: 0;
       }
     }
+    #updateNotice {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #007aff;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 9999;
+  display: none;
+}
+
   </style>
 </head>
 <body>
+  <div id="updateNotice">アプリが更新されました</div>
   <div class="app">
     <h1>げりメモ</h1>
     <input id="title" placeholder="タイトル">
@@ -191,6 +207,17 @@
   });
 }
 
+/* ←←←【ここ】renderMemos が終わった直後】←←← */
+
+function showUpdateNotice() {
+  const notice = document.getElementById('updateNotice');
+  notice.style.display = 'block';
+  setTimeout(() => {
+    notice.style.display = 'none';
+  }, 5000);
+}
+
+/* ←←←【ここまで】←←← */
 
 saveButton.onclick = () => {
   if (!titleInput.value.trim() && !memoInput.value.trim()) return;
@@ -231,21 +258,12 @@ saveButton.onclick = () => {
 
  <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
+    navigator.serviceWorker.register('sw.js');
 
-      // Service Worker からのメッセージを受信
-      navigator.serviceWorker.addEventListener('message', event => {
-        if (event.data === 'UPDATED') {
-          alert('アプリが更新されました');
-        }
-      });
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  showUpdateNotice();
+});
 
-      // 更新チェックを要求
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('CHECK_UPDATE');
-      }
-
-    });
   }
 </script>
 
