@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=12">
+<link rel="manifest" href="manifest.json?v=13">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {
@@ -31,21 +31,17 @@ textarea {
   overflow-x:hidden; /* 横スクロール不可 */
   resize:none;       /* ハンドル削除 */
 }
-button {
-  border:none; border-radius:50%; width:48px; height:48px; font-size:20px; color:white; cursor:pointer; margin-right:8px;
-}
+#canvasContainer {margin-bottom:12px; width:100%;}
+#canvasContainer canvas {width:100%; height:380px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
+#canvasButtons {display:flex; gap:8px; margin-bottom:12px;}
+#canvasButtons button {border-radius:8px; width:100%; padding:12px; font-size:16px; color:white; cursor:pointer;}
 #saveCanvas {background:#007aff;}
 #clearCanvas {background:#ff3b30;}
-#sort {border-radius:8px; padding:8px 14px; font-size:16px; color:white; background:#007aff; cursor:pointer; margin-bottom:12px; width:auto; height:auto;}
 #list {flex:1; overflow-y:auto; margin-top:8px;}
 .memo-item {padding:12px; margin-bottom:12px; border-radius:12px; background:#f9f9f9; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:relative;}
 .memo-title {font-weight:bold; margin-bottom:4px;}
 .memo-date {font-size:12px; color:#666; margin-bottom:8px;}
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
-#canvasContainer {margin-bottom:12px; width:100%;}
-#canvasContainer canvas {width:100%; height:380px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
-#canvasButtons {display:flex; justify-content:flex-start; gap:8px; margin-bottom:12px;}
-#canvasButtons button {border-radius:8px; width:auto; height:auto; padding:8px 14px; font-size:16px;}
 </style>
 </head>
 <body>
@@ -59,18 +55,16 @@ button {
 <div id="canvasContainer">
   <canvas id="drawCanvas" width="400" height="380"></canvas>
   <div id="canvasButtons">
-    <button id="saveCanvas" style="background:#007aff; color:white;">保存</button>
-    <button id="clearCanvas" style="background:#ff3b30; color:white;">クリア</button>
+    <button id="saveCanvas">保存</button>
+    <button id="clearCanvas">クリア</button>
   </div>
 </div>
 
-<button id="sort">新しい順</button>
 <div id="list"></div>
 </div>
 
 <script>
 let memos = JSON.parse(localStorage.getItem('memos') || '[]');
-let sortNewest = true;
 let editingIndex = null;
 
 const canvas = document.getElementById('drawCanvas');
@@ -79,8 +73,7 @@ const ctx = canvas.getContext('2d');
 function renderMemos() {
   const listDiv = document.getElementById('list');
   listDiv.innerHTML = '';
-  const sorted = [...memos].sort((a,b)=> sortNewest? new Date(b.date)-new Date(a.date) : new Date(a.date)-new Date(b.date));
-  sorted.forEach(m=>{
+  memos.forEach(m=>{
     const index = memos.findIndex(x=>x.date===m.date && x.title===m.title);
     const div = document.createElement('div');
     div.className='memo-item';
@@ -117,7 +110,6 @@ const titleInput = document.getElementById('title');
 const memoInput = document.getElementById('memo');
 const saveCanvasButton = document.getElementById('saveCanvas');
 const clearCanvasButton = document.getElementById('clearCanvas');
-const sortButton = document.getElementById('sort');
 
 // 保存ボタン（手書き含む）
 saveCanvasButton.onclick = ()=>{
@@ -137,12 +129,6 @@ saveCanvasButton.onclick = ()=>{
   }
   localStorage.setItem('memos',JSON.stringify(memos));
   titleInput.value=''; memoInput.value=''; ctx.clearRect(0,0,canvas.width,canvas.height);
-  renderMemos();
-};
-
-sortButton.onclick = ()=>{
-  sortNewest=!sortNewest;
-  sortButton.textContent = sortNewest?'新しい順':'古い順';
   renderMemos();
 };
 
