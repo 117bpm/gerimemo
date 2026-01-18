@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=11">
+<link rel="manifest" href="manifest.json?v=12">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {
@@ -24,18 +24,18 @@ textarea {
   border-radius:8px;
   font-size:16px;
   box-sizing:border-box;
-  height:7.5em;        /* 5行分 */
-  min-height:7.5em;
-  max-height:7.5em;
-  overflow-y:auto;     /* 縦スクロール可 */
-  overflow-x:hidden;   /* 横スクロール不可 */
-  resize:none;         /* ハンドル削除 */
+  height:6em;        /* 4行分 */
+  min-height:6em;
+  max-height:6em;
+  overflow-y:auto;   /* 縦スクロール可 */
+  overflow-x:hidden; /* 横スクロール不可 */
+  resize:none;       /* ハンドル削除 */
 }
 button {
   border:none; border-radius:50%; width:48px; height:48px; font-size:20px; color:white; cursor:pointer; margin-right:8px;
 }
-#save {background:#007aff;}
-.delete {background:#ff3b30;}
+#saveCanvas {background:#007aff;}
+#clearCanvas {background:#ff3b30;}
 #sort {border-radius:8px; padding:8px 14px; font-size:16px; color:white; background:#007aff; cursor:pointer; margin-bottom:12px; width:auto; height:auto;}
 #list {flex:1; overflow-y:auto; margin-top:8px;}
 .memo-item {padding:12px; margin-bottom:12px; border-radius:12px; background:#f9f9f9; box-shadow:0 2px 6px rgba(0,0,0,0.1); position:relative;}
@@ -44,7 +44,8 @@ button {
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
 #canvasContainer {margin-bottom:12px; width:100%;}
 #canvasContainer canvas {width:100%; height:380px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
-#clearCanvas {width:auto; height:auto; border-radius:8px; margin-top:4px; display:block;}
+#canvasButtons {display:flex; justify-content:flex-start; gap:8px; margin-bottom:12px;}
+#canvasButtons button {border-radius:8px; width:auto; height:auto; padding:8px 14px; font-size:16px;}
 </style>
 </head>
 <body>
@@ -57,11 +58,13 @@ button {
 <!-- 手書きキャンバス -->
 <div id="canvasContainer">
   <canvas id="drawCanvas" width="400" height="380"></canvas>
-  <button id="clearCanvas">クリア</button>
+  <div id="canvasButtons">
+    <button id="saveCanvas" style="background:#007aff; color:white;">保存</button>
+    <button id="clearCanvas" style="background:#ff3b30; color:white;">クリア</button>
+  </div>
 </div>
 
 <button id="sort">新しい順</button>
-<button id="save">+</button>
 <div id="list"></div>
 </div>
 
@@ -112,10 +115,12 @@ renderMemos();
 
 const titleInput = document.getElementById('title');
 const memoInput = document.getElementById('memo');
-const saveButton = document.getElementById('save');
+const saveCanvasButton = document.getElementById('saveCanvas');
+const clearCanvasButton = document.getElementById('clearCanvas');
 const sortButton = document.getElementById('sort');
 
-saveButton.onclick = ()=>{
+// 保存ボタン（手書き含む）
+saveCanvasButton.onclick = ()=>{
   const textEmpty = !titleInput.value.trim() && !memoInput.value.trim();
   const canvasEmpty = ctx.getImageData(0,0,canvas.width,canvas.height).data.every(v=>v===0);
   if(textEmpty && canvasEmpty) return;
@@ -163,7 +168,7 @@ canvas.addEventListener('touchstart',startDraw);
 canvas.addEventListener('touchmove',draw);
 canvas.addEventListener('touchend',stopDraw);
 
-document.getElementById('clearCanvas').onclick = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); };
+clearCanvasButton.onclick = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); };
 </script>
 </body>
 </html>
