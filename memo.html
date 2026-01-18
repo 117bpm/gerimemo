@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<link rel="manifest" href="manifest.json?v=16">
+<link rel="manifest" href="manifest.json?v=17">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <style>
 html, body {
@@ -21,7 +21,7 @@ textarea {
   height:6em; min-height:6em; max-height:6em; overflow-y:auto; resize:none;
 }
 #canvasContainer {margin-bottom:12px; width:100%;}
-#canvasContainer canvas {width:100%; height:375px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
+#canvasContainer canvas {width:100%; height:370px; border:1px solid #ccc; touch-action:none; box-sizing:border-box;}
 #canvasButtons {display:flex; gap:8px; margin-bottom:12px;}
 #canvasButtons button {border-radius:8px; flex:1; padding:12px; font-size:16px; color:white; cursor:pointer;}
 #saveCanvas {background:#007aff;}
@@ -33,11 +33,9 @@ textarea {
 .memo-buttons {display:flex; gap:8px; margin-top:8px;}
 .memo-buttons button {
   flex:1; border-radius:6px; padding:6px; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center;
-  gap:4px;
-  color:white; border:none;
+  gap:4px; color:white; border:none; background:#999;
 }
-.memo-buttons .edit {background:#66b0ff;}   /* 控えめ青 */
-.memo-buttons .delete {background:#ff7f7f;} /* 控えめ赤 */
+.memo-buttons .delete {background:#777;}
 #updateNotice {position:fixed; top:12px; left:50%; transform:translateX(-50%); background:#007aff; color:white; padding:10px 16px; border-radius:12px; font-size:14px; box-shadow:0 4px 10px rgba(0,0,0,0.2); z-index:9999; display:none;}
 </style>
 </head>
@@ -48,9 +46,8 @@ textarea {
 <input id="title" placeholder="タイトル">
 <textarea id="memo" placeholder="メモ内容"></textarea>
 
-<!-- 手書きキャンバス -->
 <div id="canvasContainer">
-  <canvas id="drawCanvas" width="400" height="375"></canvas>
+  <canvas id="drawCanvas" width="400" height="370"></canvas>
   <div id="canvasButtons">
     <button id="saveCanvas">保存</button>
     <button id="clearCanvas">クリア</button>
@@ -102,7 +99,7 @@ function renderMemos() {
         img.onload = ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width,canvas.height); };
         img.src = m.image;
       } else { ctx.clearRect(0,0,canvas.width,canvas.height); }
-      // スクロールせずに編集可能
+      // スクロールせずそのまま編集可能
     };
 
     listDiv.appendChild(div);
@@ -115,7 +112,7 @@ const memoInput = document.getElementById('memo');
 const saveCanvasButton = document.getElementById('saveCanvas');
 const clearCanvasButton = document.getElementById('clearCanvas');
 
-// 保存ボタン（手書き含む）
+// 保存ボタン
 saveCanvasButton.onclick = ()=>{
   const textEmpty = !titleInput.value.trim() && !memoInput.value.trim();
   const canvasEmpty = ctx.getImageData(0,0,canvas.width,canvas.height).data.every(v=>v===0);
