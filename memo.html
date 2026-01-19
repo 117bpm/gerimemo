@@ -155,7 +155,6 @@ textarea {
 <input id="title" placeholder="タイトル">
 <textarea id="memo" placeholder="メモ内容"></textarea>
 
-<!-- 保存＋手書き -->
 <div class="action-row">
   <button id="saveBtn">保存</button>
   <button id="drawToggle" title="手書きする">🐾</button>
@@ -188,6 +187,15 @@ const drawToggle = document.getElementById('drawToggle');
 const canvasArea = document.getElementById('canvasArea');
 const canvas = document.getElementById('drawCanvas');
 const ctx = canvas.getContext('2d');
+
+/* ===== HTMLエスケープ（追加・保存形式は変えない） ===== */
+function escapeHTML(str){
+  if(!str) return '';
+  return str
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;");
+}
 
 /* 手書き */
 let drawing = false, lx = 0, ly = 0;
@@ -267,9 +275,9 @@ function render(){
     const d = document.createElement('div');
     d.className = 'memo c'+(i%5);
     d.innerHTML = `
-      <div class="memo-title">🐾 ${m.title||'(無題)'}</div>
+      <div class="memo-title">🐾 ${escapeHTML(m.title||'(無題)')}</div>
       <div class="memo-date">${m.date}</div>
-      <div class="memo-text">${m.text}</div>
+      <div class="memo-text">${escapeHTML(m.text)}</div>
       ${m.img?`<img src="${m.img}" style="max-width:100%;border-radius:14px;">`:''}
       <div class="memo-buttons">
         <button>✏️ 編集</button>
