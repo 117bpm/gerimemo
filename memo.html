@@ -39,14 +39,23 @@ input, textarea {
 }
 
 textarea {
-  resize: none;           /* ハンドルは使わない */
-  overflow: hidden;       /* 自動伸長 */
+  resize: none;
+  overflow: hidden;
   min-height: 4.5em;
   line-height: 1.4;
 }
 
-button {
-  width: 100%;
+/* ===== ボタン行 ===== */
+.action-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+#saveBtn {
+  flex: 1;
+  background: #b33a2b;
+  color: white;
   padding: 12px;
   border-radius: 14px;
   border: none;
@@ -54,18 +63,19 @@ button {
   cursor: pointer;
 }
 
-#saveBtn {
-  background: #b33a2b;
-  color: white;
-  margin-bottom: 12px;
-}
-
+/* 丸い手書きボタン */
 #drawToggle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
   background: #d96c5c;
   color: white;
-  margin-bottom: 12px;
+  font-size: 20px;
+  cursor: pointer;
 }
 
+/* ===== 手書き ===== */
 #canvasArea {
   display: none;
   margin-bottom: 16px;
@@ -82,10 +92,17 @@ button {
 
 #clearCanvas {
   margin-top: 8px;
+  width: 100%;
+  padding: 10px;
+  border-radius: 14px;
+  border: none;
   background: #999;
   color: white;
+  font-size: 14px;
+  cursor: pointer;
 }
 
+/* ===== メモ表示 ===== */
 .memo {
   padding: 14px;
   border-radius: 18px;
@@ -123,6 +140,10 @@ button {
 .memo-buttons button {
   flex: 1;
   background: rgba(0,0,0,0.15);
+  border: none;
+  border-radius: 12px;
+  padding: 8px;
+  cursor: pointer;
 }
 </style>
 </head>
@@ -132,12 +153,13 @@ button {
 <h1>🐾 げりメモ</h1>
 
 <input id="title" placeholder="タイトル">
-
 <textarea id="memo" placeholder="メモ内容"></textarea>
 
-<button id="saveBtn">保存</button>
-
-<button id="drawToggle">✏️ 手書きする</button>
+<!-- 保存＋手書き -->
+<div class="action-row">
+  <button id="saveBtn">保存</button>
+  <button id="drawToggle" title="手書きする">✏️</button>
+</div>
 
 <div id="canvasArea">
   <canvas id="drawCanvas" width="400" height="300"></canvas>
@@ -148,18 +170,18 @@ button {
 </div>
 
 <script>
-/* ===== textarea 自動伸長 ===== */
+/* textarea 自動伸長 */
 const memoEl = document.getElementById('memo');
 memoEl.addEventListener('input', () => {
   memoEl.style.height = 'auto';
   memoEl.style.height = memoEl.scrollHeight + 'px';
 });
 
-/* ===== データ ===== */
+/* データ */
 let memos = JSON.parse(localStorage.getItem('memos') || '[]');
 let editIndex = null;
 
-/* ===== DOM ===== */
+/* DOM */
 const titleEl = document.getElementById('title');
 const saveBtn = document.getElementById('saveBtn');
 const drawToggle = document.getElementById('drawToggle');
@@ -167,7 +189,7 @@ const canvasArea = document.getElementById('canvasArea');
 const canvas = document.getElementById('drawCanvas');
 const ctx = canvas.getContext('2d');
 
-/* ===== 手書き ===== */
+/* 手書き */
 let drawing = false, lx = 0, ly = 0;
 
 function pos(e){
@@ -205,7 +227,7 @@ clearCanvas.onclick = () => {
   ctx.clearRect(0,0,canvas.width,canvas.height);
 };
 
-/* ===== 保存 ===== */
+/* 保存 */
 saveBtn.onclick = () => {
   if(!titleEl.value && !memoEl.value) return;
 
@@ -237,7 +259,7 @@ saveBtn.onclick = () => {
   render();
 };
 
-/* ===== 表示 ===== */
+/* 表示 */
 function render(){
   list.innerHTML = '';
   memos.slice().reverse().forEach((m,i)=>{
