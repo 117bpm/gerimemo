@@ -3,133 +3,112 @@
 <head>
 <meta charset="UTF-8">
 <title>げりメモ</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <style>
-* { box-sizing: border-box; }
-
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #f2f2f7;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: #f6efe9;
+  overflow-x: hidden;
 }
 
 .app {
-  max-width: 520px;
+  max-width: 500px;
   margin: 0 auto;
   padding: 16px;
-  background: #fffaf6;
+  box-sizing: border-box;
+  background: white;
   min-height: 100vh;
 }
 
 h1 {
   text-align: center;
-  color: #b33a2b;
-  margin-bottom: 16px;
+  margin: 8px 0 16px;
 }
 
 input, textarea {
   width: 100%;
+  box-sizing: border-box;
   padding: 12px;
-  border-radius: 14px;
-  border: 1px solid #e0cfc2;
+  margin-bottom: 12px;
   font-size: 16px;
-  background: #fffdfb;
-  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 textarea {
+  height: calc(1.4em * 4 + 24px);
   resize: none;
-  overflow: hidden;
-  min-height: 4.5em;
   line-height: 1.4;
 }
 
-/* ===== ボタン行 ===== */
-.action-row {
+.button-row {
   display: flex;
   gap: 10px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-#saveBtn {
+.button-row button {
   flex: 1;
-  background: #b33a2b;
-  color: white;
-  padding: 12px;
-  border-radius: 14px;
+  height: 44px;
+  border-radius: 10px;
   border: none;
   font-size: 16px;
   cursor: pointer;
 }
 
-/* 丸い手書きボタン */
-#drawToggle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: none;
-  background: #d96c5c;
+#saveBtn {
+  background: #ff8fa3;
   color: white;
-  font-size: 20px;
-  cursor: pointer;
 }
 
-/* ===== 手書き ===== */
-#canvasArea {
+#drawToggle {
+  background: #ffe3ea;
+  font-size: 22px;
+}
+
+#canvasWrap {
   display: none;
   margin-bottom: 16px;
 }
 
 #drawCanvas {
   width: 100%;
-  height: 300px;
-  border-radius: 16px;
-  border: 1px solid #e0cfc2;
-  background: white;
+  height: 260px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   touch-action: none;
 }
 
 #clearCanvas {
   margin-top: 8px;
   width: 100%;
-  padding: 10px;
-  border-radius: 14px;
+  height: 40px;
+  border-radius: 8px;
   border: none;
-  background: #999;
-  color: white;
-  font-size: 14px;
+  background: #eee;
   cursor: pointer;
 }
 
-/* ===== メモ表示 ===== */
 .memo {
-  padding: 14px;
-  border-radius: 18px;
-  margin-bottom: 14px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  background: #fff7f9;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
 }
-
-.c0 { background:#fde2e2 }
-.c1 { background:#f9e4c8 }
-.c2 { background:#fcebd5 }
-.c3 { background:#f6d6cc }
-.c4 { background:#f3e7dc }
 
 .memo-title {
   font-weight: bold;
-  margin-bottom: 4px;
-}
-
-.memo-date {
-  font-size: 12px;
-  opacity: .6;
   margin-bottom: 6px;
 }
 
 .memo-text {
   white-space: pre-wrap;
-  margin-bottom: 8px;
+  word-break: break-word;
+  margin-bottom: 10px;
 }
 
 .memo-buttons {
@@ -139,164 +118,156 @@ textarea {
 
 .memo-buttons button {
   flex: 1;
-  background: rgba(0,0,0,0.15);
+  height: 36px;
+  border-radius: 8px;
   border: none;
-  border-radius: 12px;
-  padding: 8px;
+  background: #e0e0e0;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  body { background: #1c1c1e; }
+  .app { background: #2c2c2e; color: white; }
+  input, textarea { background: #3a3a3c; color: white; border: none; }
+  .memo { background: #3a3a3c; }
 }
 </style>
 </head>
 
 <body>
 <div class="app">
-<h1>🐾 げりメモ</h1>
+  <h1>げりメモ 🐾</h1>
 
-<input id="title" placeholder="タイトル">
-<textarea id="memo" placeholder="メモ内容"></textarea>
+  <input id="title" placeholder="タイトル">
+  <textarea id="content" placeholder="内容"></textarea>
 
-<!-- 保存＋手書き -->
-<div class="action-row">
-  <button id="saveBtn">保存</button>
-  <button id="drawToggle" title="手書きする">🐾</button>
-</div>
+  <div class="button-row">
+    <button id="saveBtn">保存</button>
+    <button id="drawToggle" title="手書きする">🐾</button>
+  </div>
 
-<div id="canvasArea">
-  <canvas id="drawCanvas" width="400" height="300"></canvas>
-  <button id="clearCanvas">クリア</button>
-</div>
+  <div id="canvasWrap">
+    <canvas id="drawCanvas"></canvas>
+    <button id="clearCanvas">クリア</button>
+  </div>
 
-<div id="list"></div>
+  <div id="list"></div>
 </div>
 
 <script>
-/* textarea 自動伸長 */
-const memoEl = document.getElementById('memo');
-memoEl.addEventListener('input', () => {
-  memoEl.style.height = 'auto';
-  memoEl.style.height = memoEl.scrollHeight + 'px';
-});
+const titleEl = document.getElementById('title');
+const contentEl = document.getElementById('content');
+const listEl = document.getElementById('list');
+const saveBtn = document.getElementById('saveBtn');
+const drawToggle = document.getElementById('drawToggle');
+const canvasWrap = document.getElementById('canvasWrap');
+const canvas = document.getElementById('drawCanvas');
+const clearCanvas = document.getElementById('clearCanvas');
 
-/* データ */
 let memos = JSON.parse(localStorage.getItem('memos') || '[]');
 let editIndex = null;
 
-/* DOM */
-const titleEl = document.getElementById('title');
-const saveBtn = document.getElementById('saveBtn');
-const drawToggle = document.getElementById('drawToggle');
-const canvasArea = document.getElementById('canvasArea');
-const canvas = document.getElementById('drawCanvas');
-const ctx = canvas.getContext('2d');
-
-/* 手書き */
-let drawing = false, lx = 0, ly = 0;
-
-function pos(e){
-  const r = canvas.getBoundingClientRect();
-  const p = e.touches ? e.touches[0] : e;
-  return {
-    x:(p.clientX-r.left)*canvas.width/r.width,
-    y:(p.clientY-r.top)*canvas.height/r.height
-  };
+/* HTML無効化（絵文字OK） */
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
-canvas.onmousedown = e => { drawing = true; ({x:lx,y:ly}=pos(e)); };
-canvas.onmousemove = e => {
-  if(!drawing) return;
-  const p = pos(e);
-  ctx.beginPath();
-  ctx.moveTo(lx,ly);
-  ctx.lineTo(p.x,p.y);
-  ctx.lineWidth = 2;
-  ctx.lineCap = 'round';
-  ctx.stroke();
-  lx = p.x; ly = p.y;
-};
-canvas.onmouseup = () => drawing = false;
-canvas.ontouchstart = canvas.onmousedown;
-canvas.ontouchmove = canvas.onmousemove;
-canvas.ontouchend = () => drawing = false;
+function render() {
+  listEl.innerHTML = '';
+  memos.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'memo';
+    div.innerHTML = `
+      <div class="memo-title">${escapeHTML(m.title || '(無題)')}</div>
+      <div class="memo-text">${escapeHTML(m.content || '')}</div>
+      ${m.image ? `<img src="${m.image}" style="width:100%;border-radius:8px;margin-bottom:8px;">` : ''}
+      <div class="memo-buttons">
+        <button data-edit="${i}">✏️ 編集</button>
+        <button data-del="${i}">🗑 削除</button>
+      </div>
+    `;
+    listEl.appendChild(div);
+  });
+}
 
-drawToggle.onclick = () => {
-  canvasArea.style.display =
-    canvasArea.style.display === 'none' ? 'block' : 'none';
-};
-
-clearCanvas.onclick = () => {
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-};
-
-/* 保存 */
 saveBtn.onclick = () => {
-  if(!titleEl.value && !memoEl.value) return;
-
-  const hasImg = ctx.getImageData(0,0,canvas.width,canvas.height)
-    .data.some(v=>v!==0);
-
   const data = {
     title: titleEl.value,
-    text: memoEl.value,
-    img: hasImg ? canvas.toDataURL() : null,
-    date: new Date().toLocaleString()
+    content: contentEl.value,
+    image: canvas.dataset.img || null
   };
 
-  if(editIndex !== null){
+  if (editIndex !== null) {
     memos[editIndex] = data;
     editIndex = null;
   } else {
-    memos.push(data);
+    memos.unshift(data);
   }
 
   localStorage.setItem('memos', JSON.stringify(memos));
-
   titleEl.value = '';
-  memoEl.value = '';
-  memoEl.style.height = 'auto';
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  canvasArea.style.display = 'none';
-
+  contentEl.value = '';
+  canvas.dataset.img = '';
+  canvasWrap.style.display = 'none';
+  clearCanvas.click();
   render();
 };
 
-/* 表示 */
-function render(){
-  list.innerHTML = '';
-  memos.slice().reverse().forEach((m,i)=>{
-    const idx = memos.length-1-i;
-    const d = document.createElement('div');
-    d.className = 'memo c'+(i%5);
-    d.innerHTML = `
-      <div class="memo-title">🐾 ${m.title||'(無題)'}</div>
-      <div class="memo-date">${m.date}</div>
-      <div class="memo-text">${m.text}</div>
-      ${m.img?`<img src="${m.img}" style="max-width:100%;border-radius:14px;">`:''}
-      <div class="memo-buttons">
-        <button>✏️ 編集</button>
-        <button>🗑️ 削除</button>
-      </div>
-    `;
-    d.querySelectorAll('button')[0].onclick = () => {
-      titleEl.value = m.title;
-      memoEl.value = m.text;
-      memoEl.dispatchEvent(new Event('input'));
-      if(m.img){
-        const img = new Image();
-        img.onload = () => ctx.drawImage(img,0,0);
-        img.src = m.img;
-        canvasArea.style.display = 'block';
-      }
-      editIndex = idx;
-      window.scrollTo({top:0,behavior:'smooth'});
-    };
-    d.querySelectorAll('button')[1].onclick = () => {
-      memos.splice(idx,1);
-      localStorage.setItem('memos',JSON.stringify(memos));
-      render();
-    };
-    list.appendChild(d);
-  });
-}
+listEl.onclick = e => {
+  if (e.target.dataset.edit) {
+    const i = e.target.dataset.edit;
+    const m = memos[i];
+    titleEl.value = m.title;
+    contentEl.value = m.content;
+    editIndex = i;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  if (e.target.dataset.del) {
+    memos.splice(e.target.dataset.del, 1);
+    localStorage.setItem('memos', JSON.stringify(memos));
+    render();
+  }
+};
+
+/* 手書き */
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.clientWidth;
+canvas.height = canvas.clientHeight;
+ctx.lineWidth = 3;
+ctx.lineCap = 'round';
+
+let drawing = false;
+canvas.addEventListener('pointerdown', e => {
+  drawing = true;
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+});
+canvas.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  ctx.lineTo(e.offsetX, e.offsetY);
+  ctx.stroke();
+});
+canvas.addEventListener('pointerup', () => {
+  drawing = false;
+  canvas.dataset.img = canvas.toDataURL();
+});
+
+clearCanvas.onclick = () => {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  canvas.dataset.img = '';
+};
+
+drawToggle.onclick = () => {
+  canvasWrap.style.display =
+    canvasWrap.style.display === 'block' ? 'none' : 'block';
+};
 
 render();
 </script>
