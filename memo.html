@@ -8,157 +8,170 @@
 
 <style>
 html, body {
-  margin:0;
-  padding:0;
-  height:100%;
-  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
-  background:#f2f2f7;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f6efe9;
 }
 
+/* アプリ全体 */
 .app {
-  display:flex;
-  flex-direction:column;
-  padding:16px;
-  box-sizing:border-box;
-  background:white;
-  width:100%;
-  max-width:500px;
-  margin:0 auto;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #fffaf6;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100vh;
 }
 
+/* タイトル */
 h1 {
-  text-align:center;
-  font-size:1.8em;
-  margin:8px 0 16px 0;
+  text-align: center;
+  font-size: 1.8em;
+  margin: 8px 0 16px;
+  color: #b33a2b;
 }
 
+/* 入力欄 */
 input, textarea {
-  width:100%;
-  padding:12px;
-  margin-bottom:12px;
-  border:1px solid #ccc;
-  border-radius:8px;
-  font-size:16px;
-  box-sizing:border-box;
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 12px;
+  border: 1px solid #e0cfc2;
+  border-radius: 14px;
+  font-size: 16px;
+  box-sizing: border-box;
+  background: #fffdfb;
 }
 
 textarea {
-  height:4.5em;       /* 約4行分 */
-  resize:none;
+  height: 4.5em; /* 約4行 */
+  resize: none;
 }
 
+/* 手書き */
 #canvasContainer {
-  margin-bottom:12px;
-  width:100%;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#drawModeButton {
+  background: #d96c5c;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 #drawCanvas {
-  width:100%;
-  height:360px;
-  border:1px solid #ccc;
-  box-sizing:border-box;
-  display:none;
-  touch-action:none;
+  display: none;
+  width: 100%;
+  height: 350px;
+  border-radius: 16px;
+  border: 1px solid #e0cfc2;
+  background: #fff;
+  touch-action: none;
 }
 
 #canvasButtons {
-  display:flex;
-  gap:8px;
+  display: flex;
+  gap: 8px;
 }
 
 #canvasButtons button {
-  flex:1;
-  padding:12px;
-  border-radius:8px;
-  font-size:16px;
-  border:none;
-  cursor:pointer;
-  color:white;
+  flex: 1;
+  padding: 12px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  color: white;
+  cursor: pointer;
 }
 
-#drawModeButton,
 #saveCanvas {
-  background:#007aff;
+  background: #b33a2b;
 }
 
 #clearCanvas {
-  background:#ff3b30;
+  background: #999;
 }
 
+/* メモ一覧 */
 #list {
-  flex:1;
-  overflow-y:auto;
-  margin-top:8px;
+  flex: 1;
+  overflow-y: auto;
 }
 
+/* メモカード */
 .memo-item {
-  padding:12px;
-  margin-bottom:12px;
-  border-radius:12px;
-  background:#f9f9f9;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 14px;
+  padding: 14px;
+  border-radius: 18px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
 }
 
-.memo-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  cursor:pointer;
-}
+/* 猫カラー（ランダム） */
+.memo-color-0 { background: #fde2e2; }
+.memo-color-1 { background: #f9e4c8; }
+.memo-color-2 { background: #fcebd5; }
+.memo-color-3 { background: #f6d6cc; }
+.memo-color-4 { background: #f3e7dc; }
 
+/* メモ内容 */
 .memo-title {
-  font-weight:bold;
+  font-weight: bold;
+  margin-bottom: 4px;
 }
 
 .memo-date {
-  font-size:12px;
-  color:#666;
-}
-
-.memo-content {
-  display:none;
-  margin-top:8px;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
 }
 
 .memo-text {
-  white-space:pre-wrap;   /* ★ 改行をそのまま表示 */
-  margin-bottom:8px;
+  white-space: pre-wrap;
+  line-height: 1.5;
+  margin-bottom: 10px;
 }
 
+/* ボタン */
 .memo-buttons {
-  display:flex;
-  gap:8px;
+  display: flex;
+  gap: 8px;
 }
 
 .memo-buttons button {
-  flex:1;
-  border-radius:6px;
-  padding:8px;
-  font-size:14px;
-  cursor:pointer;
-  border:none;
-  background:#888;
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  flex: 1;
+  padding: 8px;
+  border-radius: 12px;
+  border: none;
+  background: rgba(0,0,0,0.15);
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
 }
 
+/* ダークモード */
 @media (prefers-color-scheme: dark) {
-  body { background:#1c1c1e; }
-  .app { background:#2c2c2e; color:white; }
-  input, textarea { background:#3a3a3c; color:white; border:none; }
-  .memo-item { background:#3a3a3c; }
-  .memo-date { color:#aaa; }
+  body { background: #2b2523; }
+  .app { background: #2f2a27; color: #f5f0eb; }
+  input, textarea { background: #3a3330; color: #f5f0eb; border: none; }
 }
 </style>
 </head>
 
 <body>
 <div class="app">
+
 <h1>げりメモ</h1>
 
 <input id="title" placeholder="タイトル">
@@ -166,7 +179,7 @@ textarea {
 
 <div id="canvasContainer">
   <button id="drawModeButton">手書きモード</button>
-  <canvas id="drawCanvas" width="400" height="360"></canvas>
+  <canvas id="drawCanvas" width="400" height="350"></canvas>
   <div id="canvasButtons">
     <button id="saveCanvas">保存</button>
     <button id="clearCanvas">クリア</button>
@@ -187,13 +200,14 @@ const ctx = drawCanvas.getContext('2d');
 const drawModeButton = document.getElementById('drawModeButton');
 
 let drawMode = false;
+
 drawModeButton.onclick = () => {
   drawMode = !drawMode;
   drawCanvas.style.display = drawMode ? 'block' : 'none';
   drawModeButton.textContent = drawMode ? '描画モードON' : '手書きモード';
 };
 
-/* ===== 描画処理 ===== */
+/* 描画処理 */
 let drawing = false, lastX = 0, lastY = 0;
 
 function getPos(e) {
@@ -221,6 +235,7 @@ function draw(e) {
   ctx.lineTo(p.x, p.y);
   ctx.lineWidth = 2;
   ctx.lineCap = 'round';
+  ctx.strokeStyle = '#333';
   ctx.stroke();
   lastX = p.x; lastY = p.y;
 }
@@ -235,36 +250,29 @@ drawCanvas.addEventListener('touchmove', draw);
 drawCanvas.addEventListener('touchend', stopDraw);
 
 document.getElementById('clearCanvas').onclick = () => {
-  ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+  ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
 };
 
-/* ===== 表示 ===== */
+/* 表示 */
 function renderMemos() {
   const list = document.getElementById('list');
   list.innerHTML = '';
 
   memos.slice().reverse().forEach((m, i) => {
+    const colorClass = 'memo-color-' + (i % 5);
     const div = document.createElement('div');
-    div.className = 'memo-item';
+    div.className = `memo-item ${colorClass}`;
+
     div.innerHTML = `
-      <div class="memo-header">
-        <div class="memo-title">${m.title || '(無題)'}</div>
-        <div class="memo-date">${m.date}</div>
-      </div>
-      <div class="memo-content">
-        <div class="memo-text">${m.content || ''}</div>
-        ${m.image ? `<img src="${m.image}" style="max-width:100%;border-radius:12px;">` : ''}
-        <div class="memo-buttons">
-          <button class="edit">✏️ 編集</button>
-          <button class="delete">🗑️ 削除</button>
-        </div>
+      <div class="memo-title">${m.title || '(無題)'}</div>
+      <div class="memo-date">${m.date}</div>
+      <div class="memo-text">${m.content || ''}</div>
+      ${m.image ? `<img src="${m.image}" style="max-width:100%;border-radius:14px;margin-bottom:8px;">` : ''}
+      <div class="memo-buttons">
+        <button class="edit">✏️ 編集</button>
+        <button class="delete">🗑️ 削除</button>
       </div>
     `;
-
-    const content = div.querySelector('.memo-content');
-    div.querySelector('.memo-header').onclick = () => {
-      content.style.display = content.style.display === 'block' ? 'none' : 'block';
-    };
 
     div.querySelector('.delete').onclick = () => {
       memos.splice(memos.length - 1 - i, 1);
@@ -278,10 +286,10 @@ function renderMemos() {
       memoInput.value = memos[idx].content;
       editingIndex = idx;
 
-      ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      ctx.clearRect(0,0,drawCanvas.width,drawCanvas.height);
       if (memos[idx].image) {
         const img = new Image();
-        img.onload = () => ctx.drawImage(img, 0, 0, drawCanvas.width, drawCanvas.height);
+        img.onload = () => ctx.drawImage(img,0,0,drawCanvas.width,drawCanvas.height);
         img.src = memos[idx].image;
         drawCanvas.style.display = 'block';
         drawMode = true;
@@ -296,20 +304,26 @@ function renderMemos() {
 
 renderMemos();
 
-/* ===== 保存 ===== */
+/* 保存 */
 document.getElementById('saveCanvas').onclick = () => {
   if (!titleInput.value.trim() && !memoInput.value.trim()) return;
 
-  const image = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height).data
-    .some(v => v !== 0) ? drawCanvas.toDataURL() : null;
+  const hasImage = ctx.getImageData(0,0,drawCanvas.width,drawCanvas.height).data.some(v => v !== 0);
+  const image = hasImage ? drawCanvas.toDataURL() : null;
 
   const now = new Date().toLocaleString();
 
   if (editingIndex !== null) {
-    memos[editingIndex] = { ...memos[editingIndex], title:titleInput.value, content:memoInput.value, image:image ?? memos[editingIndex].image, date:now };
+    memos[editingIndex] = {
+      ...memos[editingIndex],
+      title: titleInput.value,
+      content: memoInput.value,
+      image: image ?? memos[editingIndex].image,
+      date: now
+    };
     editingIndex = null;
   } else {
-    memos.push({ title:titleInput.value, content:memoInput.value, image, date:now });
+    memos.push({ title: titleInput.value, content: memoInput.value, image, date: now });
   }
 
   localStorage.setItem('memos', JSON.stringify(memos));
